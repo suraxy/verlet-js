@@ -1,9 +1,20 @@
 verlet-js
 =========
 
-A simple Verlet (pronounced 'ver-ley') physics engine written in javascript.
+不为别的就为了搞那么牛叉的效果
 
-Particles, distance constraints, and angular constraints are all supported by verlet-js.  From these primitives it is possible to construct just about anything you can imagine.
+只用了620行js  这也该值得好好捣鼓捣鼓
+
+还不清楚内部是如何实现的
+
+首先弄清楚和verlet算法是什么关系
+
+http://www.crazycpp.com/?p=133
+
+在自己感兴趣的地方加加中文注释 
+
+反正代码不多  即便每句话都写注释也才620行嘛 ^ ^
+
 
 License
 -------
