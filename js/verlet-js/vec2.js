@@ -25,6 +25,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 // A simple 2-dimensional vector implementation
+// 这话清晰的不用不解释  我那么烂的英语都看明白了 相信你也懂！
 
 function Vec2(x, y) {
 	this.x = x || 0;
@@ -51,6 +52,14 @@ Vec2.prototype.scale = function(coef) {
 	return new Vec2(this.x*coef, this.y*coef);
 }
 
+/*
+  这个叫做什么好呢，可变 set方法？ 好怪！
+  其实js中都没有final 理论上说是不需要mutable的
+  但是在对象的使用过程中 我们可能为其绑定了其他的一些方法和事件
+  这时我们想把一个向量的值交给这个向量 就不能用简单的等号赋值了
+  用mutable倒是 起到了数据和操作分开的作用 
+  以上都是return的new  这里开始为相同的操作return this
+*/
 Vec2.prototype.mutableSet = function(v) {
 	this.x = v.x;
 	this.y = v.y;
@@ -81,6 +90,7 @@ Vec2.prototype.mutableDiv = function(v) {
 	return this;
 }
 
+
 Vec2.prototype.mutableScale = function(coef) {
 	this.x *= coef;
 	this.y *= coef;
@@ -91,18 +101,22 @@ Vec2.prototype.equals = function(v) {
 	return this.x == v.x && this.y == v.y;
 }
 
+//这个的意思是？ 在xx条件下近似相同
 Vec2.prototype.epsilonEquals = function(v, epsilon) {
 	return Math.abs(this.x - v.x) <= epsilon && Math.abs(this.y - v.y) <= epsilon;
 }
 
+//向量的长度
 Vec2.prototype.length = function(v) {
 	return Math.sqrt(this.x*this.x + this.y*this.y);
 }
 
+//向量长度的平方
 Vec2.prototype.length2 = function(v) {
 	return this.x*this.x + this.y*this.y;
 }
 
+//那这个是？  凌乱了
 Vec2.prototype.dist = function(v) {
 	return Math.sqrt(this.dist2(v));
 }

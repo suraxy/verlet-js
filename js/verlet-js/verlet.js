@@ -23,6 +23,15 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+/*
+  这写法有趣 
+  1.看requestAnimationFrame是否存在
+  2.requestAnimation不存在 则根据浏览器不同引用到她
+  3.如果浏览器不支持requestAnimation 就做降级处理 定义每秒60的帧频率
+  ps:这段代码写得好有文化 牛叉！
+  link: requestAnimation用法  http://mzhou.me/article/95467/
+*/
+
 window.requestAnimFrame = window.requestAnimationFrame
 || window.webkitRequestAnimationFrame
 || window.mozRequestAnimationFrame
@@ -31,6 +40,11 @@ window.requestAnimFrame = window.requestAnimationFrame
 || function(callback) {
 	window.setTimeout(callback, 1000 / 60);
 };
+
+/*
+ particle:粒子 (单词翻译咱都写上了，哥们多够意思！ - -)
+ 、
+*/
 
 function Particle(pos) {
 	this.pos = (new Vec2()).mutableSet(pos);
