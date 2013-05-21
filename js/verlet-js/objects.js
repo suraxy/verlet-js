@@ -25,6 +25,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 // generic verlet entities
 
+//混合物--点
 VerletJS.prototype.point = function(pos) {
 	var composite = new this.Composite();
 	composite.particles.push(new Particle(pos));
@@ -32,6 +33,11 @@ VerletJS.prototype.point = function(pos) {
 	return composite;
 }
 
+/*
+	混合物--线段
+	vertices点集  
+	stiffness僵硬程度 （siffness越大 拟真度越低  消耗资源越少）
+*/
 VerletJS.prototype.lineSegments = function(vertices, stiffness) {
 	var i;
 	
@@ -39,6 +45,8 @@ VerletJS.prototype.lineSegments = function(vertices, stiffness) {
 	
 	for (i in vertices) {
 		composite.particles.push(new Particle(vertices[i]));
+		//对于verlet.js的分析我们知道混合物是由粒子和约束组成
+		//对于约束目前还不了解
 		if (i > 0)
 			composite.constraints.push(new DistanceConstraint(composite.particles[i], composite.particles[i-1], stiffness));
 	}
@@ -47,16 +55,26 @@ VerletJS.prototype.lineSegments = function(vertices, stiffness) {
 	return composite;
 }
 
+/*
+	混合物--面
+	origin起点
+	width，height 宽 ，高
+	segments 片段？？
+	pinMod  是否固定
+	stiffness 僵硬程度  
+*/
 VerletJS.prototype.cloth = function(origin, width, height, segments, pinMod, stiffness) {
 	
 	var composite = new this.Composite();
 	
+	//步幅
 	var xStride = width/segments;
 	var yStride = height/segments;
 	
 	var x,y;
 	for (y=0;y<segments;++y) {
 		for (x=0;x<segments;++x) {
+			//这里又看不懂啦！！！！
 			var px = origin.x + x*xStride - width/2 + xStride/2;
 			var py = origin.y + y*yStride - height/2 + yStride/2;
 			composite.particles.push(new Particle(new Vec2(px, py)));
@@ -78,6 +96,7 @@ VerletJS.prototype.cloth = function(origin, width, height, segments, pinMod, sti
 	return composite;
 }
 
+//tire是什么东西 !!!
 VerletJS.prototype.tire = function(origin, radius, segments, spokeStiffness, treadStiffness) {
 	var stride = (2*Math.PI)/segments;
 	var i;

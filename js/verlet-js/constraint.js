@@ -30,10 +30,19 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 function DistanceConstraint(a, b, stiffness, distance /*optional*/) {
 	this.a = a;
 	this.b = b;
+	//若未传人distance 折求a b两个向量的差的长度 当distance(这是..神马东西!!) 
 	this.distance = typeof distance != "undefined" ? distance : a.pos.sub(b.pos).length();
 	this.stiffness = stiffness;
 }
 
+
+/*
+	看了下面的 PinConstraint 和 AngleConstraint的构造方法
+	发现虽然都是contraint单参数是完全不一样的
+	所以能定在循环计算约束的时候肯定只用到了relax和draw方法、
+	relax应该是唯一使约束生效的方法
+	具体是什么意思呢  调试时再看吧 
+*/
 DistanceConstraint.prototype.relax = function(stepCoef) {
 	var normal = this.a.pos.sub(this.b.pos);
 	var m = normal.length2();

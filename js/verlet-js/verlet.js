@@ -43,6 +43,7 @@ window.requestAnimFrame = window.requestAnimationFrame
 
 /*
  particle:粒子 (单词翻译咱都写上了，哥们多够意思！ - -)
+ 等等 这里一个粒子为什么要用两个向量来表示???
  、
 */
 
@@ -53,6 +54,7 @@ function Particle(pos) {
 
 Particle.prototype.draw = function(ctx) {
 	ctx.beginPath();
+	//莫非 这是在画圆？
 	ctx.arc(this.pos.x, this.pos.y, 2, 0, 2*Math.PI);
 	ctx.fillStyle = "#2dad8f";
 	ctx.fill();
@@ -66,10 +68,10 @@ var VerletJS = function(width, height, canvas) {
 	this.mouse = new Vec2(0,0);
 	this.mouseDown = false;
 	this.draggedEntity = null;
-	this.selectionRadius = 20;
+	this.selectionRadius = 20;//传说中的鲁棒？
 	this.highlightColor = "#4f545c";
 	
-	this.bounds = function (particle) {
+	this.bounds = function (particle) {  //看不懂了...
 		if (particle.pos.y > this.height-1)
 			particle.pos.y = this.height-1;
 		
@@ -107,17 +109,18 @@ var VerletJS = function(width, height, canvas) {
 	};	
 	
 	// simulation params
-	this.gravity = new Vec2(0,0.2);
-	this.friction = 0.99;
-	this.groundFriction = 0.8;
+	this.gravity = new Vec2(0,0.2); //重力加速度  12/60 ??
+	this.friction = 0.99;//摩擦力
+	this.groundFriction = 0.8;//地面摩擦力
 	
 	// holds composite entities
-	this.composites = [];
+	this.composites = [];//混合物体？？？
 }
 
+//物体由粒子和约束构成？？
 VerletJS.prototype.Composite = function() {
-	this.particles = [];
-	this.constraints = [];
+	this.particles = []; //粒子
+	this.constraints = [];//约束
 	
 	this.drawParticles = null;
 	this.drawConstraints = null;
@@ -130,32 +133,43 @@ VerletJS.prototype.Composite.prototype.pin = function(index, pos) {
 	return pc;
 }
 
+
+//重点到了 真正的计算方法
 VerletJS.prototype.frame = function(step) {
 	var i, j, c;
 
+	//在一个frame力物体的运功
+	//所有物体同同时受重力和惯性的影响
+	//另外地面上的运动物体还受地面摩擦力影响
 	for (c in this.composites) {
 		for (i in this.composites[c].particles) {
-			var particles = this.composites[c].particles;
+			var particles = this.composites[c].particles;//遍历世界中的所有粒子
 			
-			// calculate velocity
+			// calculate velocity  //计算速率
+			//和上一个位置减 然后乘以约束
 			var velocity = particles[i].pos.sub(particles[i].lastPos).scale(this.friction);
 		
-			// ground friction
+			// ground friction //计算地面摩擦
+			//粒子距离地面只有一个像素 并且速率的平方和大于 0.000001 计算地摩擦力
 			if (particles[i].pos.y >= this.height-1 && velocity.length2() > 0.000001) {
 				var m = velocity.length();
 				velocity.x /= m;
-				velocity.y /= m;
+				velocity.y /= m;  //x y都除以m 转换为单位向量？ 
+				//距离地面的粒子乘以约束的单位向量  乘以摩擦力
+				//在单位时间内物体的运动距离 即速度  ？单位向量是加速度？
+				//速度乘以加速度乘以地面摩擦力 是这个单位时间内的速度？
 				velocity.mutableScale(m*this.groundFriction);
 			}
 		
+
 			// save last good state
 			particles[i].lastPos.mutableSet(particles[i].pos);
 		
 			// gravity
-			particles[i].pos.mutableAdd(this.gravity);
+			particles[i].pos.mutableAdd(this.gravity);  //重力
 		
 			// inertia	
-			particles[i].pos.mutableAdd(velocity);
+			particles[i].pos.mutableAdd(velocity);  //惯性
 		}
 	}
 	
@@ -163,7 +177,7 @@ VerletJS.prototype.frame = function(step) {
 	if (this.draggedEntity)
 		this.draggedEntity.pos.mutableSet(this.mouse);
 		
-	// relax
+	// relax  //什么意思呢。。  没看懂
 	var stepCoef = 1/step;
 	for (c in this.composites) {
 		var constraints = this.composites[c].constraints;
@@ -185,7 +199,7 @@ VerletJS.prototype.draw = function() {
 	
 	this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);	
 	
-	for (c in this.composites) {
+	for (c in this.composites) {  //约束也能画么？？？
 		// draw constraints
 		if (this.composites[c].drawConstraints) {
 			this.composites[c].drawConstraints(this.ctx, this.composites[c]);
@@ -206,6 +220,7 @@ VerletJS.prototype.draw = function() {
 	}
 
 	// highlight nearest / dragged entity
+	//高亮正在被拖拽的 或者最近的实体 （如果有）
 	var nearest = this.draggedEntity || this.nearestEntity();
 	if (nearest) {
 		this.ctx.beginPath();
@@ -215,6 +230,8 @@ VerletJS.prototype.draw = function() {
 	}
 }
 
+
+//这个方法还没研究明白
 VerletJS.prototype.nearestEntity = function() {
 	var c, i;
 	var d2Nearest = 0;
